@@ -121,6 +121,7 @@ Status GetNeighborsExecutor::handleResponse(RpcResponse& resps) {
     VLOG(1) << "Resp size: " << responses.size();
     List list;
     for (auto& resp : responses) {
+        /*
         auto dataset = resp.get_vertices();
         if (dataset == nullptr) {
             LOG(INFO) << "Empty dataset in response";
@@ -129,6 +130,25 @@ Status GetNeighborsExecutor::handleResponse(RpcResponse& resps) {
 
         VLOG(1) << "Resp row size: " << dataset->rows.size() << "Resp : " << *dataset;
         list.values.emplace_back(std::move(*dataset));
+        */
+
+        auto mockIds = resp.get_mockIds();
+        DataSet mock = std::move(*resp.get_vertices());
+        for (const auto& mockId : mockIds) {
+            Row row;
+            row.emplace_back(mockId.src);
+            row.emplace_back(Value());
+            List cell;
+            for (const auto& dst : mockId.dsts) {
+                List cellRow;
+                cellRow.emplace_back(dst);
+                cell.emplace_back(std::move(cellRow));
+            }
+            row.emplace_back(std::move(cell));
+            row.emplace_back(Value());
+            mock.emplace_back(std::move(row));
+        }
+        list.emplace_back(std::move(mock));
     }
     builder.value(Value(std::move(list)));
     return finish(builder.iter(Iterator::Kind::kGetNeighbors).finish());
