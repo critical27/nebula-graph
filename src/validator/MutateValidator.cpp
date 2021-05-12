@@ -27,7 +27,8 @@ Status InsertVerticesValidator::toPlan() {
                                        spaceId_,
                                        std::move(vertices_),
                                        std::move(tagPropNames_),
-                                       ifNotExists_);
+                                       ifNotExists_,
+                                       ignoreExistedIndex_);
     root_ = doNode;
     tail_ = root_;
     return Status::OK();
@@ -36,6 +37,7 @@ Status InsertVerticesValidator::toPlan() {
 Status InsertVerticesValidator::check() {
     auto sentence = static_cast<InsertVerticesSentence*>(sentence_);
     ifNotExists_ = sentence->isIfNotExists();
+    ignoreExistedIndex_ = sentence->ignoreExistedIndex();
     rows_ = sentence->rows();
     if (rows_.empty()) {
         return Status::SemanticError("VALUES cannot be empty");
@@ -155,6 +157,7 @@ Status InsertEdgesValidator::toPlan() {
                                     std::move(edges_),
                                     std::move(propNames_),
                                     ifNotExists_,
+                                    ignoreExistedIndex_,
                                     useChainInsert);
     root_ = doNode;
     tail_ = root_;
@@ -164,6 +167,7 @@ Status InsertEdgesValidator::toPlan() {
 Status InsertEdgesValidator::check() {
     auto sentence = static_cast<InsertEdgesSentence*>(sentence_);
     ifNotExists_ = sentence->isIfNotExists();
+    ignoreExistedIndex_ = sentence->ignoreExistedIndex();
     auto edgeStatus = qctx_->schemaMng()->toEdgeType(spaceId_, *sentence->edge());
     NG_RETURN_IF_ERROR(edgeStatus);
     edgeType_ = edgeStatus.value();

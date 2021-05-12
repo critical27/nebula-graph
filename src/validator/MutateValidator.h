@@ -37,6 +37,7 @@ private:
     std::vector<std::pair<TagID, TagSchema>>                    schemas_;
     uint16_t                                                    propSize_{0};
     bool                                                        ifNotExists_{false};
+    bool                                                        ignoreExistedIndex_{false};
     std::vector<storage::cpp2::NewVertex>                       vertices_;
 };
 
@@ -58,6 +59,7 @@ private:
 private:
     GraphSpaceID                                      spaceId_{-1};
     bool                                              ifNotExists_{false};
+    bool                                              ignoreExistedIndex_{false};
     EdgeType                                          edgeType_{-1};
     std::shared_ptr<const meta::SchemaProviderIf>     schema_;
     std::vector<std::string>                          propNames_;

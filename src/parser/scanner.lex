@@ -108,6 +108,7 @@ IP_OCTET                    ([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])
 "IF"                        { return TokenType::KW_IF; }
 "NOT"                       { return TokenType::KW_NOT; }
 "EXISTS"                    { return TokenType::KW_EXISTS; }
+"IGNORE_EXISTED_INDEX"      { return TokenType::KW_IGNORE_EXISTED_INDEX; }
 "WITH"                      { return TokenType::KW_WITH; }
 "CHANGE"                    { return TokenType::KW_CHANGE; }
 "GRANT"                     { return TokenType::KW_GRANT; }

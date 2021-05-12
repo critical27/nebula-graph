@@ -23,13 +23,15 @@ public:
                                 GraphSpaceID spaceId,
                                 std::vector<storage::cpp2::NewVertex> vertices,
                                 std::unordered_map<TagID, std::vector<std::string>> tagPropNames,
-                                bool ifNotExists) {
+                                bool ifNotExists,
+                                bool ignoreExistedIndex) {
         return qctx->objPool()->add(new InsertVertices(qctx,
                                                        input,
                                                        spaceId,
                                                        std::move(vertices),
                                                        std::move(tagPropNames),
-                                                       ifNotExists));
+                                                       ifNotExists,
+                                                       ignoreExistedIndex));
     }
 
     std::unique_ptr<PlanNodeDescription> explain() const override;
@@ -50,24 +52,31 @@ public:
         return ifNotExists_;
     }
 
+    bool getIgnoreExistedIndex() const {
+        return ignoreExistedIndex_;
+    }
+
 private:
     InsertVertices(QueryContext* qctx,
                    PlanNode* input,
                    GraphSpaceID spaceId,
                    std::vector<storage::cpp2::NewVertex> vertices,
                    std::unordered_map<TagID, std::vector<std::string>> tagPropNames,
-                   bool ifNotExists)
+                   bool ifNotExists,
+                   bool ignoreExistedIndex)
         : SingleDependencyNode(qctx, Kind::kInsertVertices, input),
           spaceId_(spaceId),
           vertices_(std::move(vertices)),
           tagPropNames_(std::move(tagPropNames)),
-          ifNotExists_(ifNotExists) {}
+          ifNotExists_(ifNotExists),
+          ignoreExistedIndex_(ignoreExistedIndex) {}
 
 private:
     GraphSpaceID spaceId_{-1};
     std::vector<storage::cpp2::NewVertex> vertices_;
     std::unordered_map<TagID, std::vector<std::string>> tagPropNames_;
     bool ifNotExists_{false};
+    bool ignoreExistedIndex_{false};
 };
 
 class InsertEdges final : public SingleDependencyNode {
@@ -78,6 +87,7 @@ public:
                              std::vector<storage::cpp2::NewEdge> edges,
                              std::vector<std::string> propNames,
                              bool ifNotExists,
+                             bool ignoreExistedIndex,
                              bool useChainInsert = false) {
         return qctx->objPool()->add(new InsertEdges(qctx,
                                                     input,
@@ -85,6 +95,7 @@ public:
                                                     std::move(edges),
                                                     std::move(propNames),
                                                     ifNotExists,
+                                                    ignoreExistedIndex,
                                                     useChainInsert));
     }
 
@@ -102,6 +113,10 @@ public:
         return ifNotExists_;
     }
 
+    bool getIgnoreExistedIndex() const {
+        return ignoreExistedIndex_;
+    }
+
     GraphSpaceID getSpace() const {
         return spaceId_;
     }
@@ -117,12 +132,14 @@ private:
                 std::vector<storage::cpp2::NewEdge> edges,
                 std::vector<std::string> propNames,
                 bool ifNotExists,
+                bool ignoreExistedIndex,
                 bool useChainInsert)
         : SingleDependencyNode(qctx, Kind::kInsertEdges, input),
           spaceId_(spaceId),
           edges_(std::move(edges)),
           propNames_(std::move(propNames)),
           ifNotExists_(ifNotExists),
+          ignoreExistedIndex_(ignoreExistedIndex),
           useChainInsert_(useChainInsert) {}
 
 private:
@@ -130,6 +147,7 @@ private:
     std::vector<storage::cpp2::NewEdge> edges_;
     std::vector<std::string> propNames_;
     bool ifNotExists_{false};
+    bool ignoreExistedIndex_{false};
     // if this enabled, add edge request will only sent to
     // outbound edges. (toss)
     bool useChainInsert_{false};

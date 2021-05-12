@@ -168,10 +168,12 @@ class InsertVerticesSentence final : public Sentence {
 public:
     InsertVerticesSentence(VertexTagList *tagList,
                            VertexRowList *rows,
-                           bool ifNotExists) {
+                           bool ifNotExists,
+                           bool ignoreExistedIndex) {
         tagList_.reset(tagList);
         rows_.reset(rows);
         ifNotExists_ = ifNotExists;
+        ignoreExistedIndex_ = ignoreExistedIndex;
         kind_ = Kind::kInsertVertices;
     }
 
@@ -189,8 +191,13 @@ public:
         return ifNotExists_;
     }
 
+    bool ignoreExistedIndex() const {
+        return ignoreExistedIndex_;
+    }
+
 private:
     bool                                        ifNotExists_{false};
+    bool                                        ignoreExistedIndex_{false};
     std::unique_ptr<VertexTagList>              tagList_;
     std::unique_ptr<VertexRowList>              rows_;
 };
@@ -260,11 +267,12 @@ private:
 
 class InsertEdgesSentence final : public Sentence {
 public:
-    explicit InsertEdgesSentence(std::string* edge, EdgeRowList* rows, bool ifNotExists)
+    explicit InsertEdgesSentence(std::string* edge, EdgeRowList* rows, bool ifNotExists, bool ignoreExistedIndex)
         : Sentence(Kind::kInsertEdges) {
         edge_.reset(edge);
         rows_.reset(rows);
         ifNotExists_ = ifNotExists;
+        ignoreExistedIndex_ = ignoreExistedIndex;
     }
 
     const std::string* edge() const {
@@ -290,6 +298,10 @@ public:
         return ifNotExists_;
     }
 
+    bool ignoreExistedIndex() const {
+        return ignoreExistedIndex_;
+    }
+
     void setDefaultPropNames() {
         isDefaultPropNames_ = true;
     }
@@ -303,6 +315,7 @@ public:
 private:
     bool                                        isDefaultPropNames_{false};
     bool                                        ifNotExists_{false};
+    bool                                        ignoreExistedIndex_{false};
     std::unique_ptr<std::string>                edge_;
     std::unique_ptr<PropertyList>               properties_;
     std::unique_ptr<EdgeRowList>                rows_;

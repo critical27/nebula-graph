@@ -778,6 +778,20 @@ TEST(Parser, InsertVertex) {
         auto result = parse(query);
         ASSERT_TRUE(result.status().isSyntaxError());
     }
+    {
+        GQLParser parser;
+        std::string query = "INSERT VERTEX IGNORE_EXISTED_INDEX person(name, age) "
+                            "VALUES \"Tom\":(\'Tom, 30)";
+        auto result = parser.parse(query);
+        ASSERT_TRUE(result.status().isSyntaxError());
+    }
+    {
+        GQLParser parser;
+        std::string query = "INSERT VERTEX NO OVERWRITE IGNORE_EXISTED_INDEX person(name, age) "
+                            "VALUES \"Tom\":(\'Tom, 30)";
+        auto result = parser.parse(query);
+        ASSERT_TRUE(result.status().isSyntaxError());
+    }
 }
 
 TEST(Parser, UpdateVertex) {
@@ -920,6 +934,20 @@ TEST(Parser, InsertEdge) {
         std::string query = "INSERT EDGE IF NOT EXISTS transfer() "
                             "VALUES \"12345\"->\"54321@1537408527\":()";
         auto result = parse(query);
+        ASSERT_TRUE(result.ok()) << result.status();
+    }
+    {
+        GQLParser parser;
+        std::string query = "INSERT EDGE IGNORE_EXISTED_INDEX transfer(amount, time_) "
+                            "VALUES \"12345\"->\"54321@1537408527\":(3.75, 1537408527)";
+        auto result = parser.parse(query);
+        ASSERT_TRUE(result.ok()) << result.status();
+    }
+    {
+        GQLParser parser;
+        std::string query = "INSERT EDGE NO OVERWRITE IGNORE_EXISTED_INDEX transfer(amount, time_) "
+                            "VALUES \"12345\"->\"54321@1537408527\":(3.75, 1537408527)";
+        auto result = parser.parse(query);
         ASSERT_TRUE(result.ok()) << result.status();
     }
 }
